@@ -15,22 +15,22 @@
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
     let
-      system = "x86_64-linux";
-
       # Replaces the old `let unstable = import <nixos-unstable> {...};`
       # channel pattern. Adds `pkgs.unstable.<name>` everywhere, so existing
       # references like `unstable.opam` / `unstable.awatcher` in
       # modules/users/thekkid.nix keep working unchanged.
       unstableOverlay = final: prev: {
         unstable = import nixpkgs-unstable {
-          inherit (final) system;
+          system = final.stdenv.hostPlatform.system;
           config.allowUnfree = true;
         };
       };
     in
     {
+      # No `system` argument here — it's set via `nixpkgs.hostPlatform` in
+      # hardware-configuration.nix (the modern replacement for passing
+      # `system` directly to nixosSystem, which trips a deprecation warning).
       nixosConfigurations.thekkid-desktop = nixpkgs.lib.nixosSystem {
-        inherit system;
         specialArgs = { inherit inputs; };
         modules = [
           { nixpkgs.overlays = [ unstableOverlay ]; }
@@ -41,7 +41,7 @@
 
       # Adding a second machine later:
       #   nixosConfigurations.<new-host> = nixpkgs.lib.nixosSystem {
-      #     inherit system; specialArgs = { inherit inputs; };
+      #     specialArgs = { inherit inputs; };
       #     modules = [
       #       { nixpkgs.overlays = [ unstableOverlay ]; }
       #       ./hosts/<new-host>/configuration.nix
