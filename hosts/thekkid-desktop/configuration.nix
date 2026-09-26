@@ -40,12 +40,14 @@
     vim openconnect dotnetCorePackages.sdk_9_0 hplip
   ];
 
-  # Broadcom wifi driver is flagged insecure by nixpkgs. Match by name
-  # prefix rather than an exact version string, so this survives kernel
-  # bumps (the exact-match form breaks every time the kernel version
-  # embedded in the derivation name changes).
+  # Broadcom wifi driver is flagged insecure by nixpkgs. `lib.getName`
+  # strips the version suffix entirely (e.g. "broadcom-sta-6.30.223.271-59-
+  # 6.18.53" -> "broadcom-sta"), so match against that stripped name rather
+  # than an exact version string — survives kernel bumps (the exact-match
+  # form breaks every time the kernel version embedded in the derivation
+  # name changes).
   nixpkgs.config.allowInsecurePredicate = pkg:
-    lib.hasPrefix "broadcom-sta-" (lib.getName pkg);
+    (lib.getName pkg) == "broadcom-sta";
 
   # Points auto-upgrade at this flake+host now that there's no channel to
   # implicitly upgrade from. flake-auto-update.nix (enabled above) keeps
