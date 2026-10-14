@@ -6,9 +6,16 @@
     ../../modules/audio-pipewire.nix
     ../../modules/users/thekkid.nix
     ../../modules/flake-auto-update.nix
+    ../../modules/wifi-drop-log.nix
   ];
 
   services.flakeAutoUpdate.enable = true;
+
+  # Homelab Wi-Fi drop investigation; run `wifi-drop-report` to read the logs.
+  services.wifiDropLog = {
+    enable = true;
+    interface = "wlp9s0";
+  };
 
   networking.hostName = "thekkid-desktop";
   networking.networkmanager.enable = true;
