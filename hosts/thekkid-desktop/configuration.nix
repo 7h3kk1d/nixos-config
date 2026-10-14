@@ -36,8 +36,10 @@
     dedicatedServer.openFirewall = true;
   };
 
+  programs.gamemode.enable = true;
+
   environment.systemPackages = with pkgs; [
-    vim openconnect dotnetCorePackages.sdk_9_0 hplip
+    vim openconnect dotnetCorePackages.sdk_9_0 hplip mangohud
   ];
 
   # Broadcom wifi driver is flagged insecure by nixpkgs. `lib.getName`
