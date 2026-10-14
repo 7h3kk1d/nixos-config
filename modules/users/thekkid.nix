@@ -12,7 +12,7 @@
       openjdk21 gimp gmp unstable.awatcher signal-desktop obs-studio tmux
       texlive.combined.scheme-full code-cursor calibre kitty alacritty
       (agda.withPackages (p: [ p.standard-library ])) jetbrains.idea
-      claude-code
+      unstable.claude-code
     ];
   };
 }
