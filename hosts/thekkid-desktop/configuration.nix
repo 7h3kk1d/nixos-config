@@ -29,6 +29,9 @@
 
   boot.supportedFilesystems = [ "ntfs" ];
 
+  # Build the homelab's Raspberry Pi/CM4 images and configs (7h3kk1d/homelab).
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
