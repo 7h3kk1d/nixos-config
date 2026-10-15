@@ -47,6 +47,8 @@ def parse_since(value):
         return time.time() - float(value[:-1]) * 86400
     if value.endswith("h"):
         return time.time() - float(value[:-1]) * 3600
+    if value.endswith("m"):
+        return time.time() - float(value[:-1]) * 60
     return datetime.fromisoformat(value).timestamp()
 
 
@@ -149,7 +151,7 @@ def last_before(items, ts):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--dir", default="/var/log/wifi-drop")
-    p.add_argument("--since", default="7d", help="e.g. 7d, 12h, or 2026-10-14[T08:00] (default 7d)")
+    p.add_argument("--since", default="7d", help="e.g. 7d, 12h, 30m, or 2026-10-14[T08:00] (default 7d)")
     p.add_argument("--min-seconds", type=float, default=3, help="ignore shorter blips (default 3)")
     p.add_argument("--grace", type=float, default=60, help="seconds after resume/boot to ignore (default 60)")
     p.add_argument("--gap", type=float, default=10, help="silence longer than this is a gap, not a drop (default 10)")
