@@ -74,6 +74,19 @@ def load_events(log_dir, since):
     return sleeps, wakes, links, nm
 
 
+def load_traces(log_dir, since):
+    """Return [(start ts, [CHECK/HOP lines])], one per wifi-drop-trace snapshot."""
+    snapshots = []
+    for ts, msg in sorted(read_lines(os.path.join(log_dir, "trace.log*"))):
+        if ts < since:
+            continue
+        if msg.startswith("TRACE-START"):
+            snapshots.append((ts, []))
+        elif snapshots and msg.startswith(("CHECK ", "HOP ")):
+            snapshots[-1][1].append(msg)
+    return snapshots
+
+
 def load_target(log_dir, name, since):
     samples = []
     for ts, msg in read_lines(os.path.join(log_dir, f"{name}.log*")):
@@ -145,6 +158,7 @@ def main():
 
     since = parse_since(args.since)
     sleeps, wakes, links, nm = load_events(args.dir, since)
+    traces = load_traces(args.dir, since)
     names = args.targets.split(",")
     gw = names[0]
 
@@ -190,6 +204,11 @@ def main():
         print(f"      link before: {link}")
         for ev in events:
             print(f"      NM {ev}")
+        snapshot = next(((t, lines) for t, lines in traces if s - 5 <= t <= e), None)
+        if snapshot:
+            print(f"      trace at {fmt(snapshot[0])[-8:]}:")
+            for line in snapshot[1]:
+                print(f"        {line}")
 
     if after_resume:
         reconnect = merge(after_resume)
