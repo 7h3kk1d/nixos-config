@@ -21,6 +21,10 @@ ping_check() { # label host [extra ping args]
 }
 
 snapshot() {
+  # Best effort: checks are expected to fail mid-drop, and under writeShellApplication's
+  # errexit/pipefail the first failed ping would end the snapshot. Runs in a background
+  # subshell, so this doesn't affect the watcher loop.
+  set +o errexit +o pipefail
   say "TRACE-START after $1 missed"
   say "CHECK addr $iface: $(ip -4 -o addr show dev "$iface" | awk '{print $4}' | paste -sd' ')"
   say "CHECK route $host: $(ip route get "$host" 2>&1 | head -1)"
