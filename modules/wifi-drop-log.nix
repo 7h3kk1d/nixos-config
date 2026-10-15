@@ -9,22 +9,12 @@
 # Run `wifi-drop-report` to list drops.
 #
 # Logs, all lines prefixed with [unix-epoch]:
-#   <logDir>/<target>.log  ping -D -O output ("no answer yet" = missed reply)
+#   <logDir>/<target>.log  one line per probe: ping's "bytes from" reply, or "no answer yet"
 #   <logDir>/events.log    START/STOP, SLEEP/RESUME, NM <action>, LINK <signal> <chan> <rate> <bssid>
 #   <logDir>/trace.log     TRACE-START, CHECK <what>: <result>, HOP <traceroute line>, RECOVERED
 { config, lib, pkgs, ... }:
 let
   cfg = config.services.wifiDropLog;
-
-  # Timestamps any line that ping didn't (errors on stderr, our own markers).
-  stamp = ''
-    while IFS= read -r line; do
-      case "$line" in
-        \[*) printf '%s\n' "$line" ;;
-        *) printf '[%s] %s\n' "$(date +%s.%N)" "$line" ;;
-      esac
-    done
-  '';
 
   logEvent = pkgs.writeShellScript "wifi-drop-event" ''
     printf '[%s] %s\n' "$(${pkgs.coreutils}/bin/date +%s.%N)" "$*" >> ${cfg.logDir}/events.log
@@ -34,7 +24,7 @@ let
     description = "Wi-Fi drop logger: ping ${host}";
     wantedBy = [ "multi-user.target" ];
     after = [ "network.target" ];
-    path = [ pkgs.iputils pkgs.coreutils ];
+    path = [ pkgs.iputils pkgs.coreutils pkgs.gnugrep ];
     serviceConfig = {
       LogsDirectory = "wifi-drop";
       LogsDirectoryMode = "0755";
@@ -42,11 +32,22 @@ let
       Restart = "always";
       RestartSec = 2;
     };
-    # ping exits when there is no route (e.g. Wi-Fi down); log that and keep going.
+    # A new ping process per probe, not one long-running ping: the XB7 stops answering a
+    # long-lived ICMP session after a while even though fresh pings get through
+    # (seen 2026-10-15), which logged minutes of false drops.
+    # The background sleep keeps probes 1s apart whether the reply is fast or times out.
     script = ''
       while true; do
-        { stdbuf -oL ping -D -O -n ${host} 2>&1; echo "PING-EXIT $?"; } | ${stamp}
-        sleep 1
+        sleep 1 &
+        at=$(date +%s.%N)
+        out=$(ping -n -c 1 -W 1 ${host} 2>&1) || true
+        if reply=$(grep -m 1 'bytes from' <<< "$out"); then
+          printf '[%s] %s\n' "$at" "$reply"
+        else
+          # Keep ping's error (e.g. "Network is unreachable" with Wi-Fi down) on the line.
+          printf '[%s] no answer yet %s\n' "$at" "$(grep -v -e '^PING' -e '^$' -e '^---' -e 'packets transmitted' <<< "$out" | head -1)"
+        fi
+        wait
       done
     '';
   };

@@ -1,7 +1,7 @@
 """Summarize /var/log/wifi-drop into real drops, separating out sleep and resume.
 
-A drop is a run of missed pings (ping -O "no answer yet", unreachable errors, or ping
-exiting) lasting at least --min-seconds while the machine was awake and not in the
+A drop is a run of missed pings ("no answer yet"; logs from before 2026-10-15 11:30 also
+have ping -O unreachable errors and PING-EXIT) lasting at least --min-seconds while the machine was awake and not in the
 first --grace seconds after resume/boot, when Wi-Fi is still reconnecting.
 Gaps with no log lines at all (the ping process frozen or not running) are counted as
 asleep when SLEEP/RESUME markers cover them, and reported as unlogged otherwise.

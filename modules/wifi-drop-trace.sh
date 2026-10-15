@@ -48,7 +48,7 @@ tail -F -n 0 "$log_dir/$name.log" 2>/dev/null | while IFS= read -r line; do
       misses=0
       continue
       ;;
-    *"no answer yet"* | *PING-EXIT* | *nreachable*)
+    *"no answer yet"*)
       misses=$((misses + 1))
       ;;
     *)
