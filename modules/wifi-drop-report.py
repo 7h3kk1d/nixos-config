@@ -177,7 +177,9 @@ def main():
         for s, e in runs:
             if e - s < args.min_seconds:
                 continue
-            if any(w <= s <= w + args.grace for w in wakes):
+            # The ping loop thaws a moment before the RESUME marker is written, so the
+            # first missed ping can predate it slightly.
+            if any(w - 5 <= s <= w + args.grace for w in wakes):
                 after_resume.append((s, e, {name}))
             else:
                 drops.append((s, e, {name}))
