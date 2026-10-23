@@ -48,8 +48,12 @@
 
   programs.gamemode.enable = true;
 
+  # Deskflow (upstream of Synergy) as the keyboard/mouse-sharing server for
+  # the MacBook. Uses libei/portals for input capture on GNOME Wayland.
+  networking.firewall.allowedTCPPorts = [ 24800 ];
+
   environment.systemPackages = with pkgs; [
-    vim openconnect dotnetCorePackages.sdk_9_0 hplip mangohud gh
+    vim openconnect dotnetCorePackages.sdk_9_0 hplip mangohud gh deskflow
   ];
 
   # Broadcom wifi driver is flagged insecure by nixpkgs. `lib.getName`
