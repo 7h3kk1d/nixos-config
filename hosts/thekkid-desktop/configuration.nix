@@ -7,6 +7,7 @@
     ../../modules/users/thekkid.nix
     ../../modules/flake-auto-update.nix
     ../../modules/wifi-drop-log.nix
+    ../../modules/firefox-history-push.nix
   ];
 
   services.flakeAutoUpdate.enable = true;
@@ -15,6 +16,12 @@
   services.wifiDropLog = {
     enable = true;
     interface = "wlp9s0";
+  };
+
+  # Weekly copy of Firefox history to the homelab collectors (7h3kk1d/collectors, sources/firefox).
+  services.firefoxHistoryPush = {
+    enable = true;
+    profile = "/home/thekkid/.mozilla/firefox/l8alrqtq.default";
   };
 
   networking.hostName = "thekkid-desktop";
