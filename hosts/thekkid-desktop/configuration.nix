@@ -8,6 +8,7 @@
     ../../modules/flake-auto-update.nix
     ../../modules/wifi-drop-log.nix
     ../../modules/firefox-history-push.nix
+    ../../modules/tailscale.nix
   ];
 
   services.flakeAutoUpdate.enable = true;
