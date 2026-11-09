@@ -6,7 +6,10 @@
     extraGroups = [ "networkmanager" "wheel" "docker" ];
 
     packages = with pkgs; [
-      firefox slack element-desktop thunderbird vesktop vscode.fhs
+      firefox slack element-desktop thunderbird vesktop
+      # Temporary (2026-11-09): 26.05's vscode 1.144.0 fails in patchPhase (missing ripgrep
+      # bin); unstable's builds. Back to plain vscode.fhs once 26.05 has the fix.
+      unstable.vscode.fhs
       google-chrome git unstable.opam gcc gnumake pkg-config zoom-us
       htop duf dust nmap anki activitywatch vlc zotero glamoroustoolkit
       openjdk21 gimp gmp unstable.awatcher signal-desktop obs-studio tmux
