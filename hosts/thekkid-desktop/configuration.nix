@@ -9,9 +9,14 @@
     ../../modules/wifi-drop-log.nix
     ../../modules/firefox-history-push.nix
     ../../modules/tailscale.nix
+    ../../modules/desktop-domicile.nix
   ];
 
-  services.flakeAutoUpdate.enable = true;
+  services.flakeAutoUpdate = {
+    enable = true;
+    # Domicile moves only by hand; see flake.nix.
+    inputs = [ "nixpkgs" "nixpkgs-unstable" ];
+  };
 
   # Homelab Wi-Fi drop investigation; run `wifi-drop-report` to read the logs.
   services.wifiDropLog = {

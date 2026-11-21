@@ -11,6 +11,11 @@
     # upgrade/downgrade on the very first flake-based switch.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # Domicile ships its own nixpkgs pin: no `follows`, so its prebuilt engine
+    # and the shell SDK stay the versions it was released with. Updated by hand
+    # (`nix flake update domicile`): the weekly auto-update skips it.
+    domicile.url = "github:cprussin/domicile/release";
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:

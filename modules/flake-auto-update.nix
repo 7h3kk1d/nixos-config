@@ -22,6 +22,13 @@ in
       default = "thekkid";
       description = "User to run the update as (needs write access to the repo and a configured git identity).";
     };
+
+    inputs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "nixpkgs" "nixpkgs-unstable" ];
+      description = "Inputs to update; empty updates them all. Leave out inputs that should only move by hand.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -35,7 +42,7 @@ in
       };
       script = ''
         set -euo pipefail
-        nix flake update
+        nix flake update ${lib.escapeShellArgs cfg.inputs}
         if ! git diff --quiet -- flake.lock; then
           git add flake.lock
           git commit -m "Automated: nix flake update ($(date -u +%Y-%m-%d))"
