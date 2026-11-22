@@ -30,5 +30,21 @@
     # X11 apps (Steam, its games): Domicile has no Xwayland; the CWM shell starts
     # this bridge on DISPLAY=:11 and puts that DISPLAY on what it launches.
     xwayland-satellite
+
+    # "CWM in a window": Domicile nested in GNOME, for trying it without switching
+    # sessions. Unsets DISPLAY so X11 apps open inside it (through the shell's
+    # xwayland-satellite) rather than on GNOME, and GNOME's LD_LIBRARY_PATH so
+    # its libraries stay out of Domicile's engine.
+    (writeShellScriptBin "cwm-nested" ''
+      exec env -u DISPLAY -u LD_LIBRARY_PATH domicile "$@"
+    '')
+    (makeDesktopItem {
+      name = "cwm-nested";
+      desktopName = "CWM in a window";
+      comment = "Compositional window management (Domicile) inside this desktop";
+      exec = "cwm-nested";
+      icon = "preferences-system-windows";
+      categories = [ "System" ];
+    })
   ];
 }
