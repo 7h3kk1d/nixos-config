@@ -27,5 +27,8 @@
     wl-clipboard
     wf-recorder
     cliphist # clipboard history over data-control
+    # X11 apps (Steam, its games): Domicile has no Xwayland; the CWM shell starts
+    # this bridge on DISPLAY=:11 and puts that DISPLAY on what it launches.
+    xwayland-satellite
   ];
 }
