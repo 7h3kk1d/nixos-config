@@ -41,7 +41,18 @@
     # running as this user can drive that page through it.
     (writeShellScriptBin "cwm-nested" ''
       export DOMICILE_ENGINE_ARGS="--remote-debugging-port=9341 ''${DOMICILE_ENGINE_ARGS:-}"
-      exec env -u DISPLAY -u LD_LIBRARY_PATH domicile "$@"
+      # Watchdog: if GPU-borrowed RAM (amdgpu GTT, normally under 100 MB) passes
+      # 4 GB, stop the nested desktop before the system runs out of memory.
+      env -u DISPLAY -u LD_LIBRARY_PATH domicile "$@" & pid=$!
+      gtt() { local t=0 f; for f in /sys/class/drm/card*/device/mem_info_gtt_used; do [ -r "$f" ] && t=$(( t + $(<"$f") )); done; echo $t; }
+      while kill -0 $pid 2>/dev/null; do
+        if [ "$(gtt)" -gt $(( 4096 * 1048576 )) ]; then
+          /bin/notify-send -u critical "CWM stopped" "GPU memory ran away; closed the nested desktop to protect the session."
+          kill -TERM $pid; sleep 5; kill -KILL $pid 2>/dev/null; break
+        fi
+        sleep 2
+      done
+      wait $pid
     '')
     (makeDesktopItem {
       name = "cwm-nested";
