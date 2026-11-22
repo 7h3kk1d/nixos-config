@@ -36,11 +36,11 @@
     # xwayland-satellite) rather than on GNOME, and GNOME's LD_LIBRARY_PATH so
     # its libraries stay out of Domicile's engine.
     #
-    # DevTools on localhost:9333 (trial only, not the login session): lets the
+    # DevTools on localhost:9341 (trial only, not the login session): lets the
     # shell's page be inspected while CWM is being tried out. Any program
     # running as this user can drive that page through it.
     (writeShellScriptBin "cwm-nested" ''
-      export DOMICILE_ENGINE_ARGS="--remote-debugging-port=9333 ''${DOMICILE_ENGINE_ARGS:-}"
+      export DOMICILE_ENGINE_ARGS="--remote-debugging-port=9341 ''${DOMICILE_ENGINE_ARGS:-}"
       exec env -u DISPLAY -u LD_LIBRARY_PATH domicile "$@"
     '')
     (makeDesktopItem {
