@@ -2,6 +2,11 @@
 {
   users.users.thekkid = {
     isNormalUser = true;
+    # Keep the systemd user manager running with no one logged in, so a logout
+    # (or switching between GNOME and Domicile) doesn't kill tmux and what runs
+    # in it: apps live in scopes under user@1000.service, which otherwise stops
+    # when the last session ends.
+    linger = true;
     description = "Alexander Bandukwala";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
 
