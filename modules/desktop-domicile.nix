@@ -47,7 +47,7 @@
       gtt() { local t=0 f; for f in /sys/class/drm/card*/device/mem_info_gtt_used; do [ -r "$f" ] && t=$(( t + $(<"$f") )); done; echo $t; }
       while kill -0 $pid 2>/dev/null; do
         if [ "$(gtt)" -gt $(( 4096 * 1048576 )) ]; then
-          /bin/notify-send -u critical "CWM stopped" "GPU memory ran away; closed the nested desktop to protect the session."
+          ${pkgs.libnotify}/bin/notify-send -u critical "CWM stopped" "GPU memory ran away; closed the nested desktop to protect the session."
           kill -TERM $pid; sleep 5; kill -KILL $pid 2>/dev/null; break
         fi
         sleep 2
